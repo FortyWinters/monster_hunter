@@ -1,1 +1,1 @@
-pub mod mh_monster;
+pub mod monster;
