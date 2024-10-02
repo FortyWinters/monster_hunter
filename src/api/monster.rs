@@ -3,7 +3,7 @@ use crate::models::mh_monster;
 use crate::Pool;
 use actix_web::{get, web, Error, HttpResponse};
 use diesel::r2d2::{ConnectionManager, PooledConnection};
-use diesel::SqliteConnection;
+use diesel::PgConnection;
 use serde::{Deserialize, Serialize};
 
 pub fn handle_error<E: std::fmt::Debug>(e: E, message: &str) -> actix_web::Error {
@@ -34,7 +34,7 @@ pub async fn get_info_handler(
 }
 
 async fn get_info(
-    db_connection: &mut PooledConnection<ConnectionManager<SqliteConnection>>,
+    db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     item: MonsterRequestJson,
 ) -> Result<mh_monster::MHMonster, Error> {
     log::info!(

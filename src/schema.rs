@@ -2,9 +2,9 @@
 
 diesel::table! {
     mh_monster (id) {
-        id -> Nullable<Integer>,
-        monster_id -> Integer,
+        id -> Int4,
+        monster_id -> Int4,
         monster_name -> Text,
-        monster_type -> Integer,
+        monster_type -> Int4,
     }
 }

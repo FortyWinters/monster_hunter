@@ -6,7 +6,7 @@ use diesel::r2d2::{ConnectionManager, PooledConnection};
 
 #[allow(dead_code)]
 pub async fn get_by_monster_id(
-    db_connection: &mut PooledConnection<ConnectionManager<SqliteConnection>>,
+    db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     query_monster_id: i32,
 ) -> Result<MHMonster, diesel::result::Error> {
     let result: MHMonster = mh_monster
@@ -16,7 +16,7 @@ pub async fn get_by_monster_id(
 }
 
 pub async fn get_by_monster_name(
-    db_connection: &mut PooledConnection<ConnectionManager<SqliteConnection>>,
+    db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
     query_monster_name: &String,
 ) -> Result<MHMonster, diesel::result::Error> {
     let result: MHMonster = mh_monster

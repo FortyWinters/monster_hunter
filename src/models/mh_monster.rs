@@ -1,10 +1,10 @@
 use crate::schema::*;
-use serde::{Deserialize, Serialize};
 use diesel;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct MHMonster {
-    pub id: Option<i32>,
+    pub id: i32,
     pub monster_id: i32,
     pub monster_name: String,
     pub monster_type: i32,
