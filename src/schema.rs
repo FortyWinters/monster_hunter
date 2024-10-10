@@ -1,34 +1,37 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    monster_rise (id) {
+    monster_info (id) {
         id -> Int4,
         monster_id -> Int4,
         monster_name -> Text,
         monster_type -> Int4,
+        monster_alias -> Nullable<Text>,
+        monster_description -> Nullable<Text>,
+        game_type -> Int4,
     }
 }
 
 diesel::table! {
-    monster_wild (id) {
+    monster_part (id) {
         id -> Int4,
         monster_id -> Int4,
-        monster_name -> Text,
-        monster_type -> Int4,
+        part_id -> Int4,
+        part_name -> Text,
     }
 }
 
 diesel::table! {
-    monster_world (id) {
+    monster_weakness (id) {
         id -> Int4,
-        monster_id -> Int4,
-        monster_name -> Text,
-        monster_type -> Int4,
+        part_id -> Int4,
+        weakness_name -> Text,
+        weakness_level -> Int4,
     }
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
-    monster_rise,
-    monster_wild,
-    monster_world,
+    monster_info,
+    monster_part,
+    monster_weakness,
 );

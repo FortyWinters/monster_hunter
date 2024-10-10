@@ -1,5 +1,5 @@
 use crate::dao;
-use crate::models::monster;
+use crate::models::monster_info;
 use crate::Pool;
 use actix_web::{web, Error, HttpResponse};
 use diesel::r2d2::{ConnectionManager, PooledConnection};
@@ -8,9 +8,9 @@ use paste::paste;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct MonsterReqJson {
-    pub monster_name: String,
-    pub game: i32, // world=>0, rise=>1, wild=>2
+pub struct MonsterInfoReqJson {
+    pub name: String,   // name or alias
+    pub game_type: i32, // world=>0, rise=>1, wild=>2
 }
 
 pub fn handle_error<E: std::fmt::Debug>(e: E, message: &str) -> actix_web::Error {
@@ -41,15 +41,14 @@ macro_rules! api {
     };
 }
 
-api!(get, "/info/get", MonsterReqJson, get_info);
+api!(get, "/info/get", MonsterInfoReqJson, get_info);
 
 async fn get_info(
     db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    item: MonsterReqJson,
-) -> Result<monster::Monster, Error> {
-    let monster_info =
-        dao::monster::get_by_monster_name(db_connection, &item.monster_name, item.game)
-            .await
-            .map_err(|e| handle_error(e, "get_info, dao::monster::get_by_monster_name failed"))?;
+    item: MonsterInfoReqJson,
+) -> Result<monster_info::MonsterInfo, Error> {
+    let monster_info = dao::monster_info::get_by_name(db_connection, &item.name, item.game_type)
+        .await
+        .map_err(|e| handle_error(e, "get_info, dao::monster::get_by_monster_name failed"))?;
     Ok(monster_info)
 }
