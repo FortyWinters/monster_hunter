@@ -1,6 +1,7 @@
 use crate::dao;
 use crate::models;
 use crate::models::monster_info::{self, MonsterInfoJson};
+use crate::mods::spider::SpMonster;
 use crate::mods::spider::Spider;
 use crate::Pool;
 use actix_web::{web, Error, HttpResponse};
@@ -63,13 +64,32 @@ async fn get_info(
 
 async fn update_info(
     db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    _item: MonsterInfoUpdateReqJson,
+    item: MonsterInfoUpdateReqJson,
 ) -> Result<i32, Error> {
     let sp = Spider::new().unwrap();
-    let monster_url_vec = sp.get_world_monster_url().await.unwrap();
-    let monster_info_vec = sp.get_world_monster_by_url(monster_url_vec).await.unwrap();
-
     let mut monster_info_json_vec: Vec<MonsterInfoJson> = Vec::new();
+    let monster_info_vec: Vec<SpMonster>;
+
+    match item.game_type {
+        0 => {
+            let monster_url_vec = sp.get_world_monster_url().await.unwrap();
+            monster_info_vec = sp.get_world_monster_by_url(monster_url_vec).await.unwrap();
+        }
+        1 => {
+            let lg_monster_url_vec = sp.get_rise_monster_url("lg").await.unwrap();
+            let sm_monster_url_vec = sp.get_rise_monster_url("sm").await.unwrap();
+            let mut monster_url_vec = lg_monster_url_vec.clone();
+            monster_url_vec.extend(sm_monster_url_vec);
+            monster_info_vec = sp.get_rise_monster_by_url(monster_url_vec).await.unwrap();
+        }
+        _ => {
+            return Err(handle_error(
+                "Invalid game type",
+                "update_info: Unsupported game type",
+            ));
+        }
+    }
+
     for m in monster_info_vec {
         monster_info_json_vec.push(models::monster_info::MonsterInfoJson {
             monster_id: m.monster_id,
@@ -77,7 +97,7 @@ async fn update_info(
             monster_type: 0,
             monster_description: Some(m.monster_description),
             monster_icon_url: Some(m.monster_icon_url),
-            game_type: 0,
+            game_type: item.game_type,
         });
     }
 
