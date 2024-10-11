@@ -8,8 +8,8 @@ pub struct MonsterInfo {
     pub monster_id: i32,
     pub monster_name: String,
     pub monster_type: i32,
-    pub monster_alias: Option<String>,
     pub monster_description: Option<String>,
+    pub monster_icon_url: Option<String>,
     pub game_type: i32,
 }
 
@@ -19,8 +19,8 @@ pub struct PostMonsterInfo {
     pub monster_id: i32,
     pub monster_name: String,
     pub monster_type: i32,
-    pub monster_alias: Option<String>,
     pub monster_description: Option<String>,
+    pub monster_icon_url: Option<String>,
     pub game_type: i32,
 }
 
@@ -29,7 +29,7 @@ pub struct MonsterInfoJson {
     pub monster_id: i32,
     pub monster_name: String,
     pub monster_type: i32,
-    pub monster_alias: Option<String>,
     pub monster_description: Option<String>,
+    pub monster_icon_url: Option<String>,
     pub game_type: i32,
 }

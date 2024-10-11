@@ -7,8 +7,8 @@ CREATE TABLE monster_info (
     monster_id INTEGER NOT NULL,
     monster_name TEXT NOT NULL,
     monster_type INTEGER NOT NULL,
-    monster_alias TEXT,
     monster_description TEXT,
+    monster_icon_url TEXT,
     game_type INTEGER NOT NULL -- 0: World, 1: Rise, 2: Wild
 );
 

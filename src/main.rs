@@ -6,6 +6,7 @@ use routers::*;
 mod api;
 mod dao;
 mod models;
+mod mods;
 mod routers;
 mod schema;
 use log4rs;
