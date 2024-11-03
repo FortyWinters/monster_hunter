@@ -7,12 +7,12 @@ use diesel::r2d2::{ConnectionManager, PooledConnection};
 
 pub async fn get_by_name(
     db_connection: &mut PooledConnection<ConnectionManager<PgConnection>>,
-    query_monster_name: &String,
+    query_name: &String,
     query_game_type: i32,
 ) -> Result<MonsterInfo, diesel::result::Error> {
     let result: MonsterInfo = monster_info
         .filter(game_type.eq(query_game_type))
-        .filter(monster_name.eq(query_monster_name))
+        .filter(monster_name.eq(query_name))
         .first::<MonsterInfo>(db_connection)?;
     Ok(result)
 }

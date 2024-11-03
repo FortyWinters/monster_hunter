@@ -12,16 +12,11 @@ CREATE TABLE monster_info (
     game_type INTEGER NOT NULL -- 0: World, 1: Rise, 2: Wild
 );
 
-CREATE TABLE monster_part (
-    id SERIAL PRIMARY KEY,
-    monster_id INTEGER NOT NULL,
-    part_id INTEGER NOT NULL,
-    part_name TEXT NOT NULL
-);
-
 CREATE TABLE monster_weakness (
     id SERIAL PRIMARY KEY,
-    part_id INTEGER NOT NULL,
-    weakness_name TEXT NOT NULL,
-    weakness_level INTEGER NOT NULL
+    monster_id INTEGER NOT NULL,
+    part_name TEXT NOT NULL,
+    weakness_type INTEGER NOT NULL,
+    weakness_value INTEGER NOT NULL,
+    game_type INTEGER NOT NULL -- 0: World, 1: Rise, 2: Wild
 );

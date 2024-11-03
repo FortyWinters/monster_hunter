@@ -21,10 +21,22 @@ pub struct SpMonster {
     pub monster_type: i32,
     pub monster_description: String,
     pub monster_icon_url: String,
+    pub monster_parts: Vec<SpPart>,
     pub game_type: i32,
 }
 
-#[allow(dead_code)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SpPart {
+    pub part_name: String,
+    pub weaknesses: Vec<SpWeakness>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SpWeakness {
+    pub weakness_type: i32,
+    pub weakness_value: i32,
+}
+
 impl Spider {
     pub fn new() -> Result<Spider, Error> {
         let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
@@ -90,12 +102,50 @@ impl Spider {
                 .and_then(|meta| meta.attr("content"))
                 .unwrap_or("");
 
+            let mut value_vec: Vec<String> = Vec::new();
+            if let Some(node) = document
+                .find(Name("table").and(Attr("class", "table table-lightborder table-sm")))
+                .next()
+            {
+                if let Some(part_tbody) = node.find(Name("tbody")).next() {
+                    for part_td in part_tbody.find(Name("td")) {
+                        if part_td.find(Name("img")).next().is_some() {
+                            break;
+                        }
+
+                        value_vec.push(part_td.text().trim().to_string());
+                    }
+                }
+            }
+
+            let mut part_vec: Vec<SpPart> = Vec::new();
+            let mut iter = value_vec.iter();
+            while let Some(type_name) = iter.next() {
+                let mut part = SpPart {
+                    part_name: type_name.clone(),
+                    weaknesses: Vec::new(),
+                };
+
+                part.part_name = type_name.clone();
+                for weakness_type in 0..10 {
+                    if let Some(value_str) = iter.next() {
+                        let value = value_str.parse::<i32>().unwrap();
+                        part.weaknesses.push(SpWeakness {
+                            weakness_type,
+                            weakness_value: value,
+                        });
+                    }
+                }
+                part_vec.push(part);
+            }
+
             let monster_info = SpMonster {
                 monster_id: monster_id_counter,
                 monster_name: monster_name.to_string(),
                 monster_type: 0,
                 monster_description: monster_description.to_string(),
                 monster_icon_url: monster_icon_url.to_string(),
+                monster_parts: part_vec,
                 game_type: 0,
             };
             monster_info_vec.push(monster_info);
@@ -170,12 +220,52 @@ impl Spider {
                 .and_then(|meta| meta.attr("content"))
                 .unwrap_or("");
 
+            let mut _value_vec: Vec<String> = Vec::new();
+            // if let Some(node) = document
+            //     .find(Name("table").and(Attr("class", "tmin-w-full divide-y divide-slate-100 dark:divide-slate-400/10")))
+            //     .next()
+            // {
+            //     println!("{:?}", node);
+            //     if let Some(part_tbody) = node.find(Name("tbody")).next() {
+            //         println!("{:?}", part_tbody);
+            //         for part_td in part_tbody.find(Name("td")) {
+            //             // if part_td.find(Name("img")).next().is_some() {
+            //             //     break;
+            //             // }
+            //             println!("{:?}", part_td);
+            //             value_vec.push(part_td.text().trim().to_string());
+            //         }
+            //     }
+            // }
+
+            // let mut part_vec: Vec<SpPart> = Vec::new();
+            // let mut iter = value_vec.iter();
+            // while let Some(type_name) = iter.next() {
+            //     let mut part = SpPart {
+            //         part_name: type_name.clone(),
+            //         weaknesses: Vec::new(),
+            //     };
+
+            //     part.part_name = type_name.clone();
+            //     for weakness_type in 0..10 {
+            //         if let Some(value_str) = iter.next() {
+            //             let value = value_str.parse::<i32>().unwrap();
+            //             part.weaknesses.push(SpWeakness {
+            //                 weakness_type,
+            //                 weakness_value: value,
+            //             });
+            //         }
+            //     }
+            //     part_vec.push(part);
+            // }
+
             let monster_info = SpMonster {
                 monster_id: monster_id_counter,
                 monster_name: monster_name,
                 monster_type: 0,
                 monster_description: monster_description.to_string(),
                 monster_icon_url: icon_url,
+                monster_parts: Vec::new(),
                 game_type: 1,
             };
             monster_info_vec.push(monster_info);
@@ -195,11 +285,20 @@ mod test {
     async fn test_get_world_monster() {
         let spider = Spider::new().unwrap();
 
-        let monster_url_img_vec = spider.get_rise_monster_url("lg").await.unwrap();
-        let monster_url_img_vec = spider
-            .get_rise_monster_by_url(monster_url_img_vec)
+        let monster_url_vec = spider.get_rise_monster_url("lg").await.unwrap();
+        let monster_info_vec = spider
+            .get_rise_monster_by_url(monster_url_vec[0..1].to_vec())
             .await
             .unwrap();
-        println!("{:?}", monster_url_img_vec);
+        println!("{:?}", monster_info_vec);
+
+        // let spider = Spider::new().unwrap();
+        // let monster_url_vec = vec!["https://mhworld.kiranico.com/zh/monsters/ADAfZ/can-zhua-long".to_string()];
+
+        // let monster_info_vec = spider
+        //     .get_world_monster_by_url(monster_url_vec)
+        //     .await
+        //     .unwrap();
+        // println!("{:?}", monster_info_vec);
     }
 }
